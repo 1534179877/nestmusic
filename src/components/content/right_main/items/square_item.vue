@@ -172,7 +172,8 @@ export default {
         this.$router.push({
           name: 'playlistDetail',
           params: {
-            id:this.info.id
+            id:this.info.id,
+            type:2
           }
         })
       }

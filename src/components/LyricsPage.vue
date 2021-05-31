@@ -1,8 +1,8 @@
 <template>
   <div style="position: relative;z-index: 1">
     <div class="switch">
-      <div class="mode">歌词</div>
-      <div class="mode">评论</div>
+      <div class="mode" @click="isshowlyrfn(1)">歌词</div>
+      <div class="mode" @click="isshowlyrfn(2)">评论</div>
     </div>
     <div class="Lyricspage" :style="{backgroundImage:coverImg}">
     </div>
@@ -16,8 +16,7 @@
       </div>
       <div class="lyrics">
         <div class="lyricsCard"
-
-             @scroll.stop.prevent ref="lyrCard">
+             @scroll.stop.prevent ref="lyrCard" v-show="!isshowlyr">
           <div class="title" >歌词</div>
           <div ref="words"
                class="words"
@@ -26,6 +25,9 @@
                :class="[timeTransBack(words.slice(1,words.indexOf(']')))<Time?[style='light',scroll(index)]:style='dark']||style">
                 {{words.slice(words.indexOf(']')+1)}}
           </div>
+        </div>
+        <div class="lyricsCard" v-show="isshowlyr">
+          <comment comtype="0" :music-id="musicID"></comment>
         </div>
       </div>
     </div>
@@ -36,9 +38,11 @@ import {mapState} from "vuex";
 import {artist_detail, music_lyrics} from "network/music";
 import {analysisLyrics, artistsNameComB, timeTransBack} from "utils/tools";
 import analyze from 'rgbaster'
+import comment_List from "@/components/content/comment/comment_List";
 
 export default {
 name: "LyricsPage",
+  components:{comment:comment_List},
   data(){
    return{
      lyrics:[],
@@ -51,7 +55,16 @@ name: "LyricsPage",
      MaxTime:0,
      wordsNow:10,
      currentPlaylistID:0,
-     CardColor:''
+     CardColor:'',
+
+     content:'',
+     Userhead:'',
+     isshowlyr:true,
+     commentsList:[],
+     comtype:0,
+     t:1,
+     type:0
+
    }
   },
   computed:{
@@ -95,7 +108,13 @@ name: "LyricsPage",
 
         console.log(result);
       })
-    }
+    },
+    isshowlyrfn(i){
+      console.log(i);
+      if(i==1)
+        this.isshowlyr = true;
+      else this.isshowlyr = false;
+    },
   },
   watch:{
     playState:function (newstate){
@@ -125,6 +144,9 @@ name: "LyricsPage",
     },
     maxTime:function (maxTime){
       this.MaxTime = maxTime
+    },
+    userHead:function (userHead){
+      this.UserHead = userHead;
     }
   },
   mounted() {

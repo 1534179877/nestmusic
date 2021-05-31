@@ -20,14 +20,15 @@
       </div>
     </div>
     <div class="swatch">
-      <div class="list_btn">歌曲</div>
-      <div class="comm_btn">评论</div>
+      <div class="list_btn" @click="iscomment = false">歌曲</div>
+      <div class="comm_btn" @click="iscomment = true">评论</div>
     </div>
     <div class="list">
     </div>
-    <div class="comm">
+    <div class="comm" v-show="iscomment" style="overflow-y:auto;height: 520px;padding: 0 5px">
+      <comment-list :comtype="comtype" :music-id="id"></comment-list>
     </div>
-    <div class="mainpage" style="overflow-y:auto;height: 520px;padding: 0 5px">
+    <div class="mainpage" v-show="!iscomment" style="overflow-y:auto;height: 520px;padding: 0 5px">
       <musiclittle_item v-for="item in listData.list"
                         :info="item"
                         type="songs"
@@ -40,11 +41,15 @@
 import {playlist_detail} from 'network/music'
 import {mapState} from 'vuex'
 import Musiclittle_item from "items/musiclittle_item";
+import commentList from "@/components/content/comment/comment_List";
 
 export default {
 name: "Detial_page",
-  components: {Musiclittle_item},
+  components: {Musiclittle_item,commentList},
   data(){ return{
+    comtype:0,
+    iscomment:false,
+    //
     id:Number,
     type:'',
     isloding:true,
@@ -63,7 +68,8 @@ name: "Detial_page",
   watch:{
    id:function (newId){
      console.log(newId);
-     this.type= this.$route.params.type? this.$route.params.type:'';
+     this.comtype= this.$route.params.type? this.$route.params.type:'';
+     console.log(this.comtype);
      playlist_detail(newId).then(result => {
        console.log(result);
        this.listData.title=result.data.playlist.name
